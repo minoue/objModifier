@@ -1,59 +1,61 @@
-#include <iostream>
-#include <fstream>
-#include <iterator>
-#include <filesystem>
-#include <algorithm>
 #include "objIO.hpp"
-
+#include <algorithm>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <iterator>
 
 namespace {
-    size_t split(const std::string &txt, std::vector<std::string> &strs, char ch)
-    {
-        size_t pos = txt.find( ch );
-        size_t initialPos = 0;
-        strs.clear();
+size_t split(const std::string& txt, std::vector<std::string>& strs, char ch)
+{
+    size_t pos = txt.find(ch);
+    size_t initialPos = 0;
+    strs.clear();
 
-        // Decompose statement
-        while( pos != std::string::npos ) {
-            strs.push_back( txt.substr( initialPos, pos - initialPos ) );
-            initialPos = pos + 1;
+    // Decompose statement
+    while (pos != std::string::npos) {
+        strs.push_back(txt.substr(initialPos, pos - initialPos));
+        initialPos = pos + 1;
 
-            pos = txt.find( ch, initialPos );
-        }
-
-        // Add the last one
-        strs.push_back( txt.substr( initialPos, std::min( pos, txt.size() ) - initialPos + 1 ) );
-
-        return strs.size();
+        pos = txt.find(ch, initialPos);
     }
 
-    // https://www.oreilly.com/library/view/c-cookbook/0596007612/ch03s06.html
-    // float sciToFloat(const std::string& str) {
-    // 
-    //     std::stringstream ss(str);
-    //     float d = 0;
-    //     ss >> d;
-    // 
-    //     if (ss.fail()) {
-    //         std::string s = "Unable to format ";
-    //         s += str;
-    //         s += " as a number!";
-    //         throw (s);
-    //     }
-    // 
-    // return (d);
-    // }
+    // Add the last one
+    strs.push_back(txt.substr(initialPos, std::min(pos, txt.size()) - initialPos + 1));
+
+    return strs.size();
 }
 
-Mesh::Mesh() {}
+// https://www.oreilly.com/library/view/c-cookbook/0596007612/ch03s06.html
+// float sciToFloat(const std::string& str) {
+//
+//     std::stringstream ss(str);
+//     float d = 0;
+//     ss >> d;
+//
+//     if (ss.fail()) {
+//         std::string s = "Unable to format ";
+//         s += str;
+//         s += " as a number!";
+//         throw (s);
+//     }
+//
+// return (d);
+// }
+}
 
-Mesh::Mesh(std::string file_path) : path(file_path) {
+Mesh::Mesh() { }
+
+Mesh::Mesh(std::string file_path)
+    : path(file_path)
+{
     read(file_path);
 }
 
-Mesh::~Mesh() {}
+Mesh::~Mesh() { }
 
-void::Mesh::read(std::string path) {
+void ::Mesh::read(std::string path)
+{
 
     std::ifstream file_in;
     file_in.open(path, std::ios::in);
@@ -73,12 +75,12 @@ void::Mesh::read(std::string path) {
 
     file_in.close();
 
-    for (size_t i=0; i<all_lines.size(); i++) {
-        std::string &line = all_lines[i];
+    for (size_t i = 0; i < all_lines.size(); i++) {
+        std::string& line = all_lines[i];
 
         std::vector<std::string> words;
         split(line, words, ' ');
-        std::string &prefix = words[0];
+        std::string& prefix = words[0];
 
         size_t wordCount = words.size();
         float x, y, z;
@@ -107,8 +109,8 @@ void::Mesh::read(std::string path) {
             this->normals.push_back(v);
         } else if (prefix == "f") {
             Face f;
-            for (size_t i=1; i<words.size(); i++) {
-                std::string &vertexInfo = words[i];
+            for (size_t i = 1; i < words.size(); i++) {
+                std::string& vertexInfo = words[i];
                 std::replace(vertexInfo.begin(), vertexInfo.end(), '/', ' ');
                 std::istringstream iss(vertexInfo);
                 std::string a, b, c;
@@ -130,28 +132,29 @@ void::Mesh::read(std::string path) {
     std::cout << this->texcoods.size() << " UVs" << std::endl;
     std::cout << this->normals.size() << " normals" << std::endl;
     std::cout << this->faces.size() << " faces" << std::endl;
-    
+
     this->vertices.resize(vertices.size());
 }
 
-void Mesh::setToFacenormal() {
+void Mesh::setToFacenormal()
+{
 
     std::vector<Vector3f> tempNormals;
     tempNormals.resize(this->normals.size());
     Vector3f zeroVec(0, 0, 0);
     std::fill(tempNormals.begin(), tempNormals.end(), zeroVec);
 
-    for (size_t i=0; i<this->faces.size(); i++) {
-        Face &face = this->faces[i];
+    for (size_t i = 0; i < this->faces.size(); i++) {
+        Face& face = this->faces[i];
         size_t numFaceVerts = face.FaceVertices.size();
 
-        for (size_t i=0; i<numFaceVerts; i++){
+        for (size_t i = 0; i < numFaceVerts; i++) {
             FaceVertex *current, *next, *nextNext;
 
             if (numFaceVerts - i == 2) {
                 //one before the last
                 current = &face.FaceVertices[i];
-                next = &face.FaceVertices[i+1];
+                next = &face.FaceVertices[i + 1];
                 nextNext = &face.FaceVertices[0];
             } else if (numFaceVerts - i == 1) {
                 // last triangle
@@ -160,44 +163,45 @@ void Mesh::setToFacenormal() {
                 nextNext = &face.FaceVertices[1];
             } else {
                 current = &face.FaceVertices[i];
-                next = &face.FaceVertices[i+1];
-                nextNext = &face.FaceVertices[i+2];
+                next = &face.FaceVertices[i + 1];
+                nextNext = &face.FaceVertices[i + 2];
             }
 
-            Vector3f P0 = this->vertices[current->vertexIndex-1];
-            Vector3f P1 = this->vertices[next->vertexIndex-1];
-            Vector3f P2 = this->vertices[nextNext->vertexIndex-1];
+            Vector3f P0 = this->vertices[current->vertexIndex - 1];
+            Vector3f P1 = this->vertices[next->vertexIndex - 1];
+            Vector3f P2 = this->vertices[nextNext->vertexIndex - 1];
 
             // Recalculate normals
             Vector3f E1 = P1 - P0;
             Vector3f E2 = P2 - P0;
             Vector3f faceNormal = E1.cross(E2);
-            tempNormals[current->normalIndex-1] += faceNormal;
+            tempNormals[current->normalIndex - 1] += faceNormal;
         }
     }
 
-    for (auto &N : tempNormals) {
+    for (auto& N : tempNormals) {
         N.normalize();
     }
     this->normals = tempNormals;
 }
 
-void::Mesh::write(std::string out_path) {
+void ::Mesh::write(std::string out_path)
+{
     std::cout << "Writing new obj file" << std::endl;
 
     std::ofstream output_file(out_path);
-    for (Vector3f &v : this->vertices) {
+    for (Vector3f& v : this->vertices) {
         output_file << "v " << std::to_string(v.x()) << " " << std::to_string(v.y()) << " " << std::to_string(v.z()) << "\n";
     }
-    for (Vector3f &vt : this->texcoods) {
+    for (Vector3f& vt : this->texcoods) {
         output_file << "vt " << std::to_string(vt.x()) << " " << std::to_string(vt.y()) << " " << std::to_string(vt.z()) << "\n";
     }
-    for (Vector3f &vn : this->normals) {
+    for (Vector3f& vn : this->normals) {
         output_file << "vn " << std::to_string(vn.x()) << " " << std::to_string(vn.y()) << " " << std::to_string(vn.z()) << "\n";
     }
-    for (Face &face : this->faces) {
+    for (Face& face : this->faces) {
         output_file << "f ";
-        for (FaceVertex &fv : face.FaceVertices) {
+        for (FaceVertex& fv : face.FaceVertices) {
             output_file << std::to_string(fv.vertexIndex) << "/" << std::to_string(fv.uvIndex) << "/" << std::to_string(fv.normalIndex) << " ";
         }
         output_file << "\n";

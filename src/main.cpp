@@ -1,11 +1,11 @@
-#include <filesystem>
-#include "utils.hpp"
-#include "timer.hpp"
 #include "argparse.hpp"
+#include "timer.hpp"
+#include "utils.hpp"
+#include <filesystem>
 #include <omp.h>
 
-
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[])
+{
 
     argparse::ArgumentParser program("objModifier", "1.0.0");
     program.add_argument("-v", "--verbose")
@@ -37,13 +37,12 @@ int main(int argc, char *argv[]) {
     std::vector<std::string> texture_paths;
 
     try {
-        texture_paths = program.get<std::vector<std::string> >("textures");
+        texture_paths = program.get<std::vector<std::string>>("textures");
         std::cout << texture_paths.size() << " textures provided" << std::endl;
         for (auto& tex : texture_paths) {
             std::cout << tex << std::endl;
         }
-    }
-    catch (std::logic_error& e) {
+    } catch (std::logic_error& e) {
         std::cout << "No textures provided" << std::endl;
     }
 
@@ -66,7 +65,7 @@ int main(int argc, char *argv[]) {
     Timer timer;
 
     // Load Textures
-    std::vector<std::vector<float> > texture_data;
+    std::vector<std::vector<float>> texture_data;
     int width;
     int height;
     int channels;
