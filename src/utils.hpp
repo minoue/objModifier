@@ -8,49 +8,41 @@
 #include "tiffio.hxx"
 #include "tinyexr.h"
 
-void loadExr(const std::vector<std::string>& texture_paths,
-    std::vector<std::vector<float>>& texture_data,
+void loadExr(const std::string& path, std::vector<float>& outVector,
     int& width,
     int& height,
     int& channels)
 {
 
-    texture_data.reserve(texture_paths.size());
-
     channels = 4;
 
-    int num = 1;
-    for (auto& exr : texture_paths) {
-        std::cout << "Loading exr " << num << " : " << exr << std::endl;
-        float* out;
-        const char* err = nullptr;
+    std::cout << "Loading exr :" << path << std::endl;
+    float* out;
+    const char* err = nullptr;
 
-        int ret = LoadEXR(&out, &width, &height, exr.c_str(), &err);
-        if (ret != TINYEXR_SUCCESS) {
-            if (err) {
-                fprintf(stderr, "ERR : %s\n", err);
-                FreeEXRErrorMessage(err); // release memory of error message.
-                exit(0);
-            }
-        } else {
-            std::vector<float> pixels;
-            int size = width * height * channels;
-            pixels.resize(size);
-            for (int i = 0; i < size; i++) {
-                float x = out[i];
-                pixels[i] = x;
-            }
-
-            texture_data.push_back(pixels);
-
-            free(out); // release memory of image data
+    int ret = LoadEXR(&out, &width, &height, path.c_str(), &err);
+    if (ret != TINYEXR_SUCCESS) {
+        if (err) {
+            fprintf(stderr, "ERR : %s\n", err);
+            FreeEXRErrorMessage(err); // release memory of error message.
+            exit(0);
         }
-        num += 1;
+    } else {
+        int size = width * height * channels;
+        outVector.resize(size);
+        for (int i = 0; i < size; i++) {
+            float x = out[i];
+            outVector[i] = x;
+        }
+
+        free(out); // release memory of image data
     }
 }
 
 void loadTiff(std::string& path, std::vector<float>& out, int& width, int& height, int& channels)
 {
+    std::cout << "Loading tif :" << path << std::endl;
+
     TIFF* tif = TIFFOpen(path.c_str(), "r");
     if (tif) {
         tdata_t buf;

@@ -39,9 +39,6 @@ int main(int argc, char* argv[])
     try {
         texture_paths = program.get<std::vector<std::string>>("textures");
         std::cout << texture_paths.size() << " textures provided" << std::endl;
-        for (auto& tex : texture_paths) {
-            std::cout << tex << std::endl;
-        }
     } catch (std::logic_error& e) {
         std::cout << "No textures provided" << std::endl;
     }
@@ -69,19 +66,25 @@ int main(int argc, char* argv[])
     int width;
     int height;
     int channels;
+    texture_data.reserve(texture_paths.size());
 
     timer.start();
-    if (texture_ext == ".tif" || texture_ext == ".tiff") {
-        for (auto& path : texture_paths) {
-            std::vector<float> imgVec;
+    for (auto& path : texture_paths) {
+
+        std::filesystem::path tex_path = texture_paths[0];
+        std::string texture_ext = tex_path.extension();
+
+        std::vector<float> imgVec;
+
+        if (texture_ext == ".tif" || texture_ext == ".tiff") {
             loadTiff(path, imgVec, width, height, channels);
-            texture_data.push_back(imgVec);
+        } else if (texture_ext == ".exr") {
+            loadExr(path, imgVec, width, height, channels);
+        } else {
+            std::cout << "textures not supported" << std::endl;
+            exit(0);
         }
-    } else if (texture_ext == ".exr") {
-        loadExr(texture_paths, texture_data, width, height, channels);
-    } else {
-        std::cout << "textures not supported" << std::endl;
-        exit(0);
+        texture_data.push_back(imgVec);
     }
     timer.showDuration("Texture loaded: ");
 
