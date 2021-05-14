@@ -57,9 +57,9 @@ void loadTiff(std::string& path, std::vector<float>& out, int& width, int& heigh
         out.reserve(width * height * nchannels);
 
         buf = _TIFFmalloc(TIFFScanlineSize(tif));
-        for (unsigned int row = 0; row < height; row++) {
+        for (int row = 0; row < height; row++) {
             TIFFReadScanline(tif, buf, row);
-            for (unsigned int col = 0; col < width; col++) {
+            for (int col = 0; col < width; col++) {
                 // uint16_t r = static_cast<uint16_t*>(buf)[col * nchannels + 0];
                 // uint16_t g = static_cast<uint16_t*>(buf)[col * nchannels + 1];
                 // uint16_t b = static_cast<uint16_t*>(buf)[col * nchannels + 2];
