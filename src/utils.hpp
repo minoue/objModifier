@@ -173,7 +173,7 @@ void normalDisplacement(Mesh& mesh, std::vector<std::vector<float>>& data, int w
     tempVertices.resize(mesh.vertices.size());
 
 #pragma omp parallel for
-    for (int i = 0; i < mesh.faces.size(); i++) {
+    for (size_t i = 0; i < mesh.faces.size(); i++) {
         Face& face = mesh.faces[i];
         size_t numFaceVerts = face.FaceVertices.size();
         for (size_t j = 0; j < numFaceVerts; j++) {
@@ -212,7 +212,7 @@ void vectorDisplacement(
     tempVertices.resize(mesh.vertices.size());
 
 #pragma omp parallel for
-    for (int i = 0; i < mesh.faces.size(); i++) {
+    for (size_t i = 0; i < mesh.faces.size(); i++) {
         Face& face = mesh.faces[i];
         size_t numFaceVerts = face.FaceVertices.size();
 
