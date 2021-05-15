@@ -111,14 +111,21 @@ void ::Mesh::read(std::string path)
             Face f;
             for (size_t i = 1; i < words.size(); i++) {
                 std::string& vertexInfo = words[i];
-                std::replace(vertexInfo.begin(), vertexInfo.end(), '/', ' ');
-                std::istringstream iss(vertexInfo);
-                std::string a, b, c;
-                iss >> a >> b >> c;
+                std::vector<std::string> indecies;
+                split(vertexInfo, indecies, '/');
+
                 FaceVertex fv;
-                fv.vertexIndex = std::stoi(a);
-                fv.uvIndex = std::stoi(b);
-                fv.normalIndex = std::stoi(c);
+
+                fv.vertexIndex = std::stoi(indecies[0]);
+                fv.uvIndex = std::stoi(indecies[1]);
+                
+                // When normals are soften, obj has normals per vertex so vert index = normal index
+                fv.normalIndex = std::stoi(indecies[0]);
+
+                if (indecies.size() == 3) {
+                    fv.normalIndex = std::stoi(indecies[2]);
+                }
+
                 f.FaceVertices.push_back(fv);
             }
             this->faces.push_back(f);
@@ -134,13 +141,19 @@ void ::Mesh::read(std::string path)
     std::cout << this->faces.size() << " faces" << std::endl;
 
     this->vertices.resize(vertices.size());
+
+    if (this->normals.size() == 0) {
+        std::cout << "Obj file doesn't have normal information. Generating new normals..." << std::endl;
+        setToFacenormal();
+    }
 }
 
 void Mesh::setToFacenormal()
 {
 
     std::vector<Vector3f> tempNormals;
-    tempNormals.resize(this->normals.size());
+    tempNormals.resize(this->vertices.size());
+
     Vector3f zeroVec(0, 0, 0);
     std::fill(tempNormals.begin(), tempNormals.end(), zeroVec);
 

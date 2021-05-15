@@ -98,10 +98,6 @@ int main(int argc, char* argv[])
     Mesh obj(file_in);
     timer.showDuration("Obj loaded: ");
 
-    // Normals
-    std::cout << "Re-calculating normals" << std::endl;
-    obj.setToFacenormal();
-
     // Displacement
     std::cout << "Setting new point positions" << std::endl;
     timer.start();
