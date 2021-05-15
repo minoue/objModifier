@@ -5,6 +5,8 @@
 #include <iostream>
 #include <iterator>
 
+#include "timer.hpp"
+
 namespace {
 size_t split(const std::string& txt, std::vector<std::string>& strs, char ch)
 {
@@ -56,6 +58,9 @@ Mesh::~Mesh() { }
 
 void ::Mesh::read(std::string path)
 {
+    std::cout << "Loading obj..." << std::endl;
+    Timer timer;
+    timer.start();
 
     std::ifstream file_in;
     file_in.open(path, std::ios::in);
@@ -133,6 +138,8 @@ void ::Mesh::read(std::string path)
         }
     }
 
+    timer.showDuration("Obj loaded : ");
+
     std::cout << "Finished loading geometry" << std::endl;
 
     std::cout << this->vertices.size() << " verts" << std::endl;
@@ -150,6 +157,9 @@ void ::Mesh::read(std::string path)
 
 void Mesh::setToFacenormal()
 {
+    std::cout << "Re-calculating normals" << std::endl;
+    Timer timer;
+    timer.start();
 
     std::vector<Vector3f> tempNormals;
     tempNormals.resize(this->vertices.size());
@@ -157,6 +167,7 @@ void Mesh::setToFacenormal()
     Vector3f zeroVec(0, 0, 0);
     std::fill(tempNormals.begin(), tempNormals.end(), zeroVec);
 
+#pragma omp parallel for
     for (size_t i = 0; i < this->faces.size(); i++) {
         Face& face = this->faces[i];
         size_t numFaceVerts = face.FaceVertices.size();
@@ -196,10 +207,15 @@ void Mesh::setToFacenormal()
         N.normalize();
     }
     this->normals = tempNormals;
+
+    timer.showDuration("Normal recalculated : ");
 }
 
 void ::Mesh::write(std::string out_path)
 {
+    Timer timer;
+    timer.start();
+
     std::cout << "Writing new obj file" << std::endl;
 
     std::ofstream output_file(out_path);
@@ -221,5 +237,5 @@ void ::Mesh::write(std::string out_path)
     }
     output_file.close();
 
-    std::cout << "Finished writing obj file" << std::endl;
+    timer.showDuration("Output obj exported : ");
 }

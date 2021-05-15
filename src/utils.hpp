@@ -1,5 +1,6 @@
 #pragma once
 
+#include "timer.hpp"
 #define TINYEXR_IMPLEMENTATION
 
 #include <iostream>
@@ -207,6 +208,9 @@ void vectorDisplacement(
     std::vector<std::vector<float>>& data,
     int width, int height, int channels)
 {
+    std::cout << "Setting new point positions..." << std::endl;
+    Timer timer;
+    timer.start();
 
     std::vector<Vertex> tempVertices;
     tempVertices.resize(mesh.vertices.size());
@@ -278,4 +282,6 @@ void vectorDisplacement(
         }
     }
     mesh.vertices = tempVertices;
+
+    timer.showDuration("Finished displacement : ");
 }

@@ -47,8 +47,6 @@ int main(int argc, char* argv[])
     std::filesystem::path tex_path = texture_paths[0];
     std::string texture_ext = tex_path.extension();
 
-    Timer timer;
-
     // Load Textures
     std::vector<std::vector<float>> texture_data;
     int width;
@@ -56,6 +54,7 @@ int main(int argc, char* argv[])
     int channels;
     texture_data.reserve(texture_paths.size());
 
+    Timer timer;
     timer.start();
     for (auto& path : texture_paths) {
 
@@ -74,30 +73,21 @@ int main(int argc, char* argv[])
         }
         texture_data.push_back(imgVec);
     }
-    timer.showDuration("Texture loaded: ");
+    timer.showDuration("Finished loading textures : ");
 
-    std::cout << "Texture size: " << width << "/" << height << std::endl;
-    std::cout << "number of textures loaded: " << texture_data.size() << std::endl;
+    std::cout << "Texture size : " << width << "/" << height << std::endl;
 
     // Load Object
-    std::cout << "Loading obj... : " << file_in << std::endl;
-
-    timer.start();
     Mesh obj(file_in);
-    timer.showDuration("Obj loaded: ");
 
     // Displacement
-    std::cout << "Setting new point positions..." << std::endl;
-    timer.start();
     if (program["--vector"] == true) {
         vectorDisplacement(obj, texture_data, width, height, channels);
     } else {
         normalDisplacement(obj, texture_data, width, height, channels);
     }
-    timer.showDuration("Displacement done: ");
 
     // Normal
-    std::cout << "Re-calculating normals" << std::endl;
     obj.setToFacenormal();
 
     // Write object
