@@ -8,16 +8,11 @@ int main(int argc, char* argv[])
 {
 
     argparse::ArgumentParser program("objModifier", "1.0.0");
-    program.add_argument("-v", "--verbose")
-        .help("Increase output verbosity")
-        .default_value(false)
-        .implicit_value(true);
-
-    program.add_argument("-obj", "--object")
+    program.add_argument("-o", "--object")
         .required()
         .help("specify the input obj file");
 
-    program.add_argument("-vec", "--vector")
+    program.add_argument("-v", "--vector")
         .help("Vector displacement")
         .default_value(true)
         .implicit_value(true);
@@ -42,13 +37,6 @@ int main(int argc, char* argv[])
     } catch (std::logic_error& e) {
         std::cout << "No textures provided" << std::endl;
     }
-
-    if (program["--verbose"] == true) {
-        std::cout << "Verbosity enabled" << std::endl;
-    }
-
-    // std::string file_in = argv[1];
-    // std::vector<std::string> texture_paths(argv+2, argv + argc);
 
     std::filesystem::path obj_path = file_in;
 
@@ -92,14 +80,14 @@ int main(int argc, char* argv[])
     std::cout << "number of textures loaded: " << texture_data.size() << std::endl;
 
     // Load Object
-    std::cout << "Obj: " << file_in << std::endl;
+    std::cout << "Loading obj... : " << file_in << std::endl;
 
     timer.start();
     Mesh obj(file_in);
     timer.showDuration("Obj loaded: ");
 
     // Displacement
-    std::cout << "Setting new point positions" << std::endl;
+    std::cout << "Setting new point positions..." << std::endl;
     timer.start();
     if (program["--vector"] == true) {
         vectorDisplacement(obj, texture_data, width, height, channels);
