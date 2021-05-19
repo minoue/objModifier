@@ -1,15 +1,15 @@
 #include "objIO.hpp"
 #include <algorithm>
+#include <cstddef>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <iterator>
-#include <cstddef>
-#include <cstring>
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "timer.hpp"
 
@@ -57,8 +57,7 @@ Mesh::Mesh() { }
 Mesh::Mesh(std::string file_path)
     : path(file_path)
 {
-    // read(file_path);
-    read2(file_path);
+    read(file_path);
 }
 
 Mesh::~Mesh() { }
@@ -69,92 +68,119 @@ void ::Mesh::read(std::string path)
     Timer timer;
     timer.start();
 
-    std::ifstream file_in;
-    file_in.open(path, std::ios::in);
+    static const char* prefix_v = "v ";
+    static const char* prefix_uv = "vt";
+    static const char* prefix_nml = "vn";
+    static const char* prefix_f = "f ";
 
-    if (!file_in) {
-        std::cout << "can't open the file" << std::endl;
-        exit(1);
+    std::vector<std::string> faces_temp;
+
+    const int column = 256;
+
+    char str[column];
+    char* ptr;
+
+    FILE* fp;
+    fp = fopen(path.c_str(), "r");
+    if (fp == NULL) {
+        printf("%s file cannot be opened\n", path.c_str());
+        exit(EXIT_FAILURE);
     }
 
-    std::vector<std::string> all_lines;
-    std::string tempLine;
+    while (fgets(str, column, fp) != NULL) {
+        if (strncmp(str, prefix_v, 2) == 0) {
+            // Vertex
+            ptr = strtok(str, " ");
+            int index = 0;
+            float xyz[3];
 
-    while (!file_in.eof()) {
-        std::getline(file_in, tempLine);
-        all_lines.push_back(tempLine);
-    }
-
-    file_in.close();
-
-    for (size_t i = 0; i < all_lines.size(); i++) {
-        std::string& line = all_lines[i];
-
-        std::vector<std::string> words;
-        split(line, words, ' ');
-        std::string& prefix = words[0];
-
-        size_t wordCount = words.size();
-        float x, y, z;
-
-        if (prefix == "v") {
-            x = static_cast<float>(atof(words[1].c_str()));
-            y = static_cast<float>(atof(words[2].c_str()));
-            z = static_cast<float>(atof(words[3].c_str()));
-            Vertex v(x, y, z);
-            this->vertices.push_back(v);
-        } else if (prefix == "vt") {
-            x = static_cast<float>(atof(words[1].c_str()));
-            y = static_cast<float>(atof(words[2].c_str()));
-            if (wordCount == 3) {
-                z = 0.0f;
-            } else {
-                z = static_cast<float>(atof(words[3].c_str()));
-            }
-            Vector3f v(x, y, z);
-            this->texcoods.push_back(v);
-        } else if (prefix == "vn") {
-            x = static_cast<float>(atof(words[1].c_str()));
-            y = static_cast<float>(atof(words[2].c_str()));
-            z = static_cast<float>(atof(words[3].c_str()));
-            Vector3f v(x, y, z);
-            this->normals.push_back(v);
-        } else if (prefix == "f") {
-            Face f;
-            for (size_t i = 1; i < words.size(); i++) {
-                std::string& vertexInfo = words[i];
-                std::vector<std::string> indecies;
-                split(vertexInfo, indecies, '/');
-
-                FaceVertex fv;
-
-                fv.vertexIndex = std::stoi(indecies[0]);
-                fv.uvIndex = std::stoi(indecies[1]);
-                
-                // When normals are soften, obj has normals per vertex so vert index = normal index
-                fv.normalIndex = std::stoi(indecies[0]);
-
-                if (indecies.size() == 3) {
-                    fv.normalIndex = std::stoi(indecies[2]);
+            while (ptr != NULL) {
+                ptr = strtok(NULL, " ");
+                if (ptr != NULL) {
+                    float v = atof(ptr);
+                    xyz[index] = v;
                 }
-
-                f.FaceVertices.push_back(fv);
+                index++;
             }
-            this->faces.push_back(f);
-        } else {
+            Vector3f vec(xyz);
+            this->vertices.push_back(vec);
+        } else if (strncmp(str, prefix_uv, 2) == 0) {
+            // UV
+            ptr = strtok(str, " ");
+            int index = 0;
+            float uvw[3];
+
+            while (ptr != NULL) {
+                ptr = strtok(NULL, " ");
+                if (ptr != NULL) {
+                    float v = atof(ptr);
+                    uvw[index] = v;
+                }
+                index++;
+            }
+            Vector3f vec(uvw);
+            this->texcoods.push_back(vec);
+        } else if (strncmp(str, prefix_nml, 2) == 0) {
+            // Normal
+            ptr = strtok(str, " ");
+            int index = 0;
+            float xyz[3];
+
+            while (ptr != NULL) {
+                ptr = strtok(NULL, " ");
+                if (ptr != NULL) {
+                    float v = atof(ptr);
+                    xyz[index] = v;
+                }
+                index++;
+            }
+            Vector3f vec(xyz);
+            this->normals.push_back(vec);
+        } else if (strncmp(str, prefix_f, 2) == 0) {
+            // Face
+            std::string f(str);
+            f.erase(std::remove(f.begin(), f.end(), '\n'), f.end());
+            faces_temp.push_back(f);
         }
     }
 
-    timer.showDuration("Obj loaded : ");
+    fclose(fp);
 
+    std::vector<std::string> strs;
+    std::vector<std::string> indices;
+
+    for (auto& face_str : faces_temp) {
+        split(face_str, strs, ' ');
+
+        Face f;
+
+        for (size_t i = 1; i < strs.size(); i++) {
+            split(strs[i], indices, '/');
+
+            FaceVertex fv;
+
+            fv.vertexIndex = std::stoi(indices[0]);
+            fv.uvIndex = std::stoi(indices[1]);
+
+            // When normals are soften, obj has normals per vertex so vert index = normal index
+            fv.normalIndex = std::stoi(indices[0]);
+
+            if (indices.size() == 3) {
+                fv.normalIndex = std::stoi(indices[2]);
+            }
+
+            f.FaceVertices.push_back(fv);
+        }
+        this->faces.push_back(f);
+    }
+
+    timer.showDuration("Obj loaded : ");
     std::cout << "Finished loading geometry" << std::endl;
 
     std::cout << this->vertices.size() << " verts" << std::endl;
     std::cout << this->texcoods.size() << " UVs" << std::endl;
     std::cout << this->normals.size() << " normals" << std::endl;
     std::cout << this->faces.size() << " faces" << std::endl;
-
-    this->vertices.resize(vertices.size());
 
     if (this->normals.size() == 0) {
         std::cout << "Obj file doesn't have normal information. Generating new normals..." << std::endl;
@@ -245,129 +271,4 @@ void ::Mesh::write(std::string out_path)
     output_file.close();
 
     timer.showDuration("Output obj exported : ");
-}
-
-void ::Mesh::read2(std::string path) {
-    std::cout << "Loading obj..." << std::endl;
-    Timer timer;
-    timer.start();
-
-    static const char* prefix_v = "v ";
-    static const char* prefix_uv = "vt";
-    static const char* prefix_nml = "vn";
-    static const char* prefix_f = "f ";
-
-    std::vector<std::string> faces_temp;
-
-    const int column = 256;
-
-    char str[column];
-    char* ptr;
-    
-    FILE *fp;
-    fp = fopen(path.c_str(), "r");
-    if (fp == NULL) {
-        printf("%s file cannot be opened\n", path.c_str());
-        exit(1);
-    }
-
-    while(fgets(str, column, fp) != NULL) {
-        if (strncmp(str, prefix_v, 2) == 0) { 
-            // Vertex
-            ptr = strtok(str, " ");
-            int index = 0;
-            float xyz[3];
-
-            while (ptr != NULL) {
-                ptr = strtok(NULL, " ");
-                if (ptr != NULL) {
-                    float v = atof(ptr);
-                    xyz[index] = v;
-                }
-                index++;
-            }
-            Vector3f vec(xyz);
-            this->vertices.push_back(vec);
-        } else if (strncmp(str, prefix_uv, 2) == 0) { 
-            // UV
-            ptr = strtok(str, " ");
-            int index = 0;
-            float uvw[3];
-
-            while (ptr != NULL) {
-                ptr = strtok(NULL, " ");
-                if (ptr != NULL) {
-                    float v = atof(ptr);
-                    uvw[index] = v;
-                }
-                index++;
-            }
-            Vector3f vec(uvw);
-            this->texcoods.push_back(vec);
-        } else if (strncmp(str, prefix_nml, 2) == 0) {
-            // Normal
-            ptr = strtok(str, " ");
-            int index = 0;
-            float xyz[3];
-
-            while (ptr != NULL) {
-                ptr = strtok(NULL, " ");
-                if (ptr != NULL) {
-                    float v = atof(ptr);
-                    xyz[index] = v;
-                }
-                index++;
-            }
-            Vector3f vec(xyz);
-            this->normals.push_back(vec);
-        } else if (strncmp(str, prefix_f, 2) == 0) {
-            // Face
-            std::string f(str);
-            f.erase(std::remove(f.begin(), f.end(), '\n'), f.end());
-            faces_temp.push_back(f);
-        }
-    }
-
-    fclose(fp);
-
-    std::vector<std::string> strs;
-    std::vector<std::string> indices;
-
-    for (auto& face_str : faces_temp) {
-        split(face_str, strs, ' ');
-
-        Face f;
-
-        for (size_t i=1; i<strs.size(); i++) {
-            split(strs[i], indices, '/');
-
-            FaceVertex fv;
-
-            fv.vertexIndex = std::stoi(indices[0]);
-            fv.uvIndex = std::stoi(indices[1]);
-
-            // When normals are soften, obj has normals per vertex so vert index = normal index
-            fv.normalIndex = std::stoi(indices[0]);
-
-            if (indices.size() == 3) {
-                fv.normalIndex = std::stoi(indices[2]);
-            }
-
-            f.FaceVertices.push_back(fv);
-        }
-        this->faces.push_back(f);
-    }
-
-    timer.showDuration("Obj loaded : ");
-    std::cout << "Finished loading geometry" << std::endl;
-
-    std::cout << this->vertices.size() << " verts" << std::endl;
-    std::cout << this->texcoods.size() << " UVs" << std::endl;
-    std::cout << this->normals.size() << " normals" << std::endl;
-    std::cout << this->faces.size() << " faces" << std::endl;
-
-    if (this->normals.size() == 0) {
-        std::cout << "Obj file doesn't have normal information. Generating new normals..." << std::endl;
-        setToFacenormal();
-    }
 }
