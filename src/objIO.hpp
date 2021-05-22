@@ -33,7 +33,6 @@ public:
     virtual ~Mesh();
     void echoPath();
     void read(std::string in_path);
-    void read2(std::string in_path);
     void write(std::string out_path);
     std::string path;
     std::vector<Vertex> vertices;

@@ -1,6 +1,7 @@
 #include "objIO.hpp"
 #include <algorithm>
 #include <cstddef>
+#include <cstdio>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
@@ -244,31 +245,56 @@ void Mesh::setToFacenormal()
     timer.showDuration("Normal recalculated : ");
 }
 
-void ::Mesh::write(std::string out_path)
+void Mesh::write(std::string out_path)
 {
     Timer timer;
     timer.start();
 
-    std::cout << "Writing new obj file" << std::endl;
+    std::cout << "Writing new obj file..." << std::endl;
 
-    std::ofstream output_file(out_path);
+    FILE* fp;
+    fp = fopen(out_path.c_str(), "w");
+
+    if (fp == NULL) {
+        printf("%s file cannot be opened\n", out_path.c_str());
+        exit(EXIT_FAILURE);
+    }
+
+    char line[128];
+
     for (Vector3f& v : this->vertices) {
-        output_file << "v " << std::to_string(v.x()) << " " << std::to_string(v.y()) << " " << std::to_string(v.z()) << "\n";
+        line[0] = '\0'; // clear
+        sprintf(line, "v %f %f %f\n", v.x(), v.y(), v.z());
+        fputs(line, fp);
     }
+
     for (Vector3f& vt : this->texcoods) {
-        output_file << "vt " << std::to_string(vt.x()) << " " << std::to_string(vt.y()) << " " << std::to_string(vt.z()) << "\n";
+        line[0] = '\0'; // clear
+        sprintf(line, "vt %f %f %f\n", vt.x(), vt.y(), vt.z());
+        fputs(line, fp);
     }
+
     for (Vector3f& vn : this->normals) {
-        output_file << "vn " << std::to_string(vn.x()) << " " << std::to_string(vn.y()) << " " << std::to_string(vn.z()) << "\n";
+        line[0] = '\0'; // clear
+        sprintf(line, "vn %f %f %f\n", vn.x(), vn.y(), vn.z());
+        fputs(line, fp);
     }
+
+    char indices[32];
+
     for (Face& face : this->faces) {
-        output_file << "f ";
+        line[0] = '\0'; // clear
+        sprintf(line, "f");
         for (FaceVertex& fv : face.FaceVertices) {
-            output_file << std::to_string(fv.vertexIndex) << "/" << std::to_string(fv.uvIndex) << "/" << std::to_string(fv.normalIndex) << " ";
+            indices[0] = '\0'; // clear
+            sprintf(indices, " %lu/%lu/%lu", fv.vertexIndex, fv.uvIndex, fv.normalIndex);
+            strcat(line, indices);
         }
-        output_file << "\n";
+        strcat(line, "\n");
+        fputs(line, fp);
     }
-    output_file.close();
+
+    fclose(fp);
 
     timer.showDuration("Output obj exported : ");
 }
