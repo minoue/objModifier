@@ -8,6 +8,12 @@ set(SOURCE_FILES
     src/timer.cpp
     )
 
+if (NOT EIGEN_ROOT_DIR)
+    message(FATAL_ERROR "Eigen3 dir must be set")
+else()
+    message(STATUS "Using EIGEN_DIR ${EIGEN_DIR}")
+endif()
+
 # target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_CXX)
 # target_compile_options(${PROJECT_NAME} PRIVATE "${OpenMP_CXX_FLAGS}")
 
@@ -52,6 +58,8 @@ if (OPENMP_CXX_FOUND)
 endif()
 
 include_directories(/usr/local/include)
+include_directories(${EIGEN_ROOT_DIR})
+
 link_directories(/usr/local/lib)
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
