@@ -1,6 +1,6 @@
 #include "argparse.hpp"
 #include "timer.hpp"
-#include "utils.hpp"
+#include "texture.hpp"
 #include <filesystem>
 #include <omp.h>
 
@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
             loadExr(path, imgVec, width, height, channels);
         } else {
             std::cout << "textures not supported" << std::endl;
-            exit(0);
+            exit(EXIT_FAILURE);
         }
         texture_data.push_back(imgVec);
     }
