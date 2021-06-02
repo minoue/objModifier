@@ -6,6 +6,7 @@ set(SOURCE_FILES
     src/main.cpp
     src/objIO.cpp
     src/timer.cpp
+    src/util.cpp
     )
 
 if (NOT EIGEN_ROOT_DIR)
