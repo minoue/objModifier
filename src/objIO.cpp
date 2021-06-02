@@ -115,12 +115,12 @@ void ::Mesh::read(std::string path)
     std::vector<std::string> indices;
 
     for (auto& face_str : faces_temp) {
-        split(face_str, strs, ' ');
+        Utils::split(face_str, strs, ' ');
 
         Face f;
 
         for (size_t i = 1; i < strs.size(); i++) {
-            split(strs[i], indices, '/');
+            Utils::split(strs[i], indices, '/');
 
             FaceVertex fv;
 
