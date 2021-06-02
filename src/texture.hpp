@@ -1,9 +1,6 @@
 #pragma once
 #define TINYEXR_IMPLEMENTATION
 
-#include <iostream>
-
-#include "timer.hpp"
 #include "objIO.hpp"
 #include "tiffio.hxx"
 #include "tinyexr.h"

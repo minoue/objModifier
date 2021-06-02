@@ -1,8 +1,8 @@
+#include <filesystem>
+
 #include "argparse.hpp"
 #include "timer.hpp"
 #include "texture.hpp"
-#include <filesystem>
-#include <omp.h>
 
 int main(int argc, char* argv[])
 {
@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
     } catch (const std::runtime_error& err) {
         std::cout << err.what() << std::endl;
         std::cout << program;
-        exit(0);
+        exit(EXIT_FAILURE);
     }
 
     std::string file_in = program.get<std::string>("--object");
