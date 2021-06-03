@@ -9,7 +9,9 @@ public:
     Utils();
     ~Utils();
     static size_t split(const std::string& txt, std::vector<std::string>& strs, char ch);
-    static std::string getExt(const std::string path);
+    static std::string join(const std::vector<std::string>& v, const char* delim);
+    static std::string pathGetExt(const std::string path);
+    static std::string pathReplaceBody(std::string& path, const std::string& body);
     static float sciToFloat(const std::string& str);
 
 private:

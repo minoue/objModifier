@@ -1,8 +1,7 @@
-#include <filesystem>
-
 #include "argparse.hpp"
 #include "timer.hpp"
 #include "texture.hpp"
+#include "util.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -38,14 +37,7 @@ int main(int argc, char* argv[])
         std::cout << "No textures provided" << std::endl;
     }
 
-    std::filesystem::path obj_path = file_in;
-
-    obj_path.replace_filename("out_displaced.obj");
-    obj_path.make_preferred();
-    std::string out_path = obj_path.string<char>();
-
-    std::filesystem::path tex_path = texture_paths[0];
-    std::string texture_ext = tex_path.extension();
+    std::string out_path = Utils::pathReplaceBody(file_in, "out_displaced");
 
     // Load Textures
     std::vector<std::vector<float>> texture_data;
@@ -58,14 +50,13 @@ int main(int argc, char* argv[])
     timer.start();
     for (auto& path : texture_paths) {
 
-        std::filesystem::path tex_path = texture_paths[0];
-        std::string texture_ext = tex_path.extension();
+        std::string texture_ext = Utils::pathGetExt(path);
 
         std::vector<float> imgVec;
 
-        if (texture_ext == ".tif" || texture_ext == ".tiff") {
+        if (texture_ext == "tif" || texture_ext == "tiff") {
             loadTiff(path, imgVec, width, height, channels);
-        } else if (texture_ext == ".exr") {
+        } else if (texture_ext == "exr") {
             loadExr(path, imgVec, width, height, channels);
         } else {
             std::cout << "textures not supported" << std::endl;
