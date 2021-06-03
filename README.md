@@ -2,11 +2,9 @@
 
 ## Requirements
 
-* Eigen
-* C++17
-* libtiff
-* tinyexr(included)
-
+* [Eigen](https://eigen.tuxfamily.org/index.php?title=Main_Page)
+* [libtiff](http://www.libtiff.org)
+* [tinyexr(included)](https://github.com/syoyo/tinyexr)
 
 ## Build
 
@@ -18,3 +16,23 @@ mac/linux
 >>cmake --build . --config Release
 ```
 
+## Usage
+
+```
+>>./objModifier -h
+Usage: objModifier [options] textures 
+
+Positional arguments:
+textures     
+
+Optional arguments:
+-h --help       shows help message and exits
+-v --version    prints version information and exits
+-o --object     specify the input obj file [required]
+-v --vector     Vector displacement [default: true]
+```
+
+## Example
+```
+>>./objModifier -o ../test/VDispDiagnosticMesh_high.obj ../test/testVDM.*.exr
+```
