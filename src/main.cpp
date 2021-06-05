@@ -2,6 +2,7 @@
 #include "timer.hpp"
 #include "texture.hpp"
 #include "util.hpp"
+#include <string>
 
 int main(int argc, char* argv[])
 {
@@ -46,6 +47,17 @@ int main(int argc, char* argv[])
     int channels;
     texture_data.reserve(texture_paths.size());
 
+
+    int max_udim = 0;
+    for (auto& path : texture_paths) {
+        std::string texture_udim = Utils::pathGetUdim(path);
+        int udim = std::stoi(texture_udim) - 1000;
+        if (udim > max_udim) {
+            max_udim = udim;
+        }
+    }
+    texture_data.resize(max_udim);
+
     Timer timer;
     timer.start();
     for (auto& path : texture_paths) {
@@ -62,7 +74,10 @@ int main(int argc, char* argv[])
             std::cout << "textures not supported" << std::endl;
             exit(EXIT_FAILURE);
         }
-        texture_data.push_back(imgVec);
+
+        std::string texture_udim = Utils::pathGetUdim(path);
+        int udim = std::stoi(texture_udim) - 1000;
+        texture_data[udim - 1] = imgVec;
     }
     timer.showDuration("Finished loading textures : ");
 

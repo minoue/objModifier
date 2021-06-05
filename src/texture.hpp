@@ -1,6 +1,7 @@
 #pragma once
 #define TINYEXR_IMPLEMENTATION
 
+#include "timer.hpp"
 #include "objIO.hpp"
 #include "tiffio.hxx"
 #include "tinyexr.h"
@@ -96,7 +97,7 @@ Vector2f localize_uv(const float& u, const float& v)
 Vector3f get_pixel_values(const float u, const float v, const std::vector<float>& texture, const int width, const int height, const int nchannel)
 {
     // Get pixel values by bilinear filtering
-    //
+
     float float_width = static_cast<float>(width);
     float float_height = static_cast<float>(height);
 
@@ -262,17 +263,21 @@ void vectorDisplacement(
             float v = uv0.y();
             size_t udim = get_udim(u, v);
 
-            Vector2f local_uv = localize_uv(u, v);
-
-            Vector3f rgb;
-            rgb = get_pixel_values(local_uv.x(), local_uv.y(), data[udim - 1], width, height, channels);
-
             Vector3f displace;
 
-            displace = rgb.transpose() * mat;
+            std::vector<float>& tex = data[udim - 1];
+            if (tex.size() == 0) {
+                // If texture at UV is missing, use same point
+                displace << 0, 0, 0;
+                ;
+            } else {
+                Vector2f local_uv = localize_uv(u, v);
+                Vector3f rgb;
+                rgb = get_pixel_values(local_uv.x(), local_uv.y(), tex, width, height, channels);
+                displace = rgb.transpose() * mat;
+            }
 
             Vector3f new_pp = P0 + displace;
-
             mesh.vertices[current->vertexIndex - 1].isDone = true;
             tempVertices[current->vertexIndex - 1] = new_pp;
         }

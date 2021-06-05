@@ -1,5 +1,7 @@
 #include "util.hpp"
+#include <cstddef>
 #include <sstream>
+// #include <string>
 
 Utils::Utils() {};
 
@@ -46,6 +48,19 @@ std::string Utils::pathGetExt(const std::string path)
     split(path, pathSplit, '.');
     std::string& last = pathSplit.back();
     return last;
+}
+
+std::string Utils::pathGetUdim(const std::string path)
+{
+    std::vector<std::string> pathSplit;
+    split(path, pathSplit, '.');
+    size_t n = pathSplit.size();
+    std::string& word = pathSplit[n-2];
+    size_t strLen = word.length();
+
+    std::string udim = word.substr(strLen - 4);
+
+    return udim;
 }
 
 
