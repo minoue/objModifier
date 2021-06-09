@@ -1,6 +1,7 @@
 #include "argparse.hpp"
-#include "timer.hpp"
 #include "texture.hpp"
+#include "texture2.hpp"
+#include "timer.hpp"
 #include "util.hpp"
 #include <string>
 
@@ -41,12 +42,8 @@ int main(int argc, char* argv[])
     std::string out_path = Utils::pathReplaceBody(file_in, "out_displaced");
 
     // Load Textures
-    std::vector<std::vector<float>> texture_data;
-    int width;
-    int height;
-    int channels;
+    std::vector<Image> texture_data;
     texture_data.reserve(texture_paths.size());
-
 
     int max_udim = 0;
     for (auto& path : texture_paths) {
@@ -62,35 +59,22 @@ int main(int argc, char* argv[])
     timer.start();
     for (auto& path : texture_paths) {
 
-        std::string texture_ext = Utils::pathGetExt(path);
-
-        std::vector<float> imgVec;
-
-        if (texture_ext == "tif" || texture_ext == "tiff") {
-            loadTiff(path, imgVec, width, height, channels);
-        } else if (texture_ext == "exr") {
-            loadExr(path, imgVec, width, height, channels);
-        } else {
-            std::cout << "textures not supported" << std::endl;
-            exit(EXIT_FAILURE);
-        }
+        Image img(path);
 
         std::string texture_udim = Utils::pathGetUdim(path);
         int udim = std::stoi(texture_udim) - 1000;
-        texture_data[udim - 1] = imgVec;
+        texture_data[udim - 1] = img;
     }
     timer.showDuration("Finished loading textures : ");
-
-    std::cout << "Texture size : " << width << "/" << height << std::endl;
 
     // Load Object
     Mesh obj(file_in);
 
     // Displacement
     if (program["--vector"] == true) {
-        vectorDisplacement(obj, texture_data, width, height, channels);
+        Texture::vectorDisplacement(obj, texture_data);
     } else {
-        normalDisplacement(obj, texture_data, width, height, channels);
+        Texture::normalDisplacement(obj, texture_data);
     }
 
     // Normal
