@@ -1,4 +1,4 @@
-#include "argparse.hpp"
+#include "CLI11.hh"
 #include "texture.hpp"
 #include "texture2.hpp"
 #include "timer.hpp"
@@ -7,39 +7,21 @@
 
 int main(int argc, char* argv[])
 {
+    std::vector<std::string> args(argv, argv + argc); 
 
-    argparse::ArgumentParser program("objModifier", "1.0.0");
-    program.add_argument("-o", "--object")
-        .required()
-        .help("specify the input obj file");
+    CLI::App app{"objModifier"};
 
-    program.add_argument("-v", "--vector")
-        .help("Vector displacement")
-        .default_value(true)
-        .implicit_value(true);
-
-    program.add_argument("textures")
-        .remaining();
-
-    try {
-        program.parse_args(argc, argv);
-    } catch (const std::runtime_error& err) {
-        std::cout << err.what() << std::endl;
-        std::cout << program;
-        exit(EXIT_FAILURE);
-    }
-
-    std::string file_in = program.get<std::string>("--object");
     std::vector<std::string> texture_paths;
+    std::string input_obj;
+    bool normalDisplacement = false;
 
-    try {
-        texture_paths = program.get<std::vector<std::string>>("textures");
-        std::cout << texture_paths.size() << " textures provided" << std::endl;
-    } catch (std::logic_error& e) {
-        std::cout << "No textures provided" << std::endl;
-    }
+    app.add_option("-t, --textures", texture_paths, "Displacement textures");
+    app.add_option("-i, --input", input_obj, "Input obj file");
+    app.add_flag("-n, --normalDisplacement", normalDisplacement, "Normal displacement");
 
-    std::string out_path = Utils::pathReplaceBody(file_in, "out_displaced");
+    CLI11_PARSE(app, argc, argv);
+
+    std::string out_path = Utils::pathReplaceBody(input_obj, "out_displaced");
 
     // Load Textures
     std::vector<Image> texture_data;
@@ -68,12 +50,14 @@ int main(int argc, char* argv[])
     timer.showDuration("Finished loading textures : ");
 
     // Load Object
-    Mesh obj(file_in);
+    Mesh obj(input_obj);
 
     // Displacement
-    if (program["--vector"] == true) {
+    if (!normalDisplacement) {
+        std::cout << "Applying vector displacement" << std::endl;
         Texture::vectorDisplacement(obj, texture_data);
     } else {
+        std::cout << "Applying normal displacement" << std::endl;
         Texture::normalDisplacement(obj, texture_data);
     }
 
