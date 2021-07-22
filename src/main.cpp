@@ -1,6 +1,5 @@
 #include "CLI11.hh"
 #include "texture.hpp"
-#include "texture2.hpp"
 #include "timer.hpp"
 #include "util.hpp"
 #include <string>

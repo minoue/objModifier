@@ -1,6 +1,6 @@
 #define TINYEXR_IMPLEMENTATION
 
-#include "texture.hpp"
+#include "image.hpp"
 #include "tiffio.hxx"
 #include "tinyexr.h"
 #include "util.hpp"
