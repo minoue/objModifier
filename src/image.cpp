@@ -20,6 +20,10 @@ void Image::read(const std::string path)
     std::string ext = Utils::pathGetExt(path);
     if (ext == "exr") {
         loadExr(path);
+    } else if (ext == "tif" || ext == "tiff") {
+        loadTif(path);
+    } else {
+        std::cout << "Not supported images" << std::endl;
     }
 }
 
@@ -55,36 +59,37 @@ void Image::loadExr(const std::string& path)
 
 void Image::loadTif(const std::string& path)
 {
-    // int& width = this->width;
-    // int& height = this->height;
-    // int& nchannels = this->nchannels;
+    uint32_t width;
+    uint32_t height;
+    uint16_t nc;
 
     std::cout << "Loading tif :" << path << std::endl;
 
     TIFF* tif = TIFFOpen(path.c_str(), "r");
     if (tif) {
         tdata_t buf;
-        uint16_t nchannels;
 
-        TIFFGetField(tif, TIFFTAG_IMAGELENGTH, this->height);
-        TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, this->width);
-        TIFFGetField(tif, TIFFTAG_SAMPLESPERPIXEL, this->nchannels);
+        TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &height);
+        TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &width);
+        TIFFGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &nc);
 
-        nchannels = static_cast<int>(this->nchannels);
+        this->nchannels = static_cast<int>(nc);
+        this->width = static_cast<int>(width);
+        this->height = static_cast<int>(height);
 
-        this->pixels.reserve(width * height * nchannels);
+        this->pixels.reserve(width * height * nc);
 
         buf = _TIFFmalloc(TIFFScanlineSize(tif));
-        for (int row = 0; row < height; row++) {
+        for (uint32_t row = 0; row < height; row++) {
             TIFFReadScanline(tif, buf, row);
-            for (int col = 0; col < width; col++) {
+            for (uint32_t col = 0; col < width; col++) {
                 // uint16_t r = static_cast<uint16_t*>(buf)[col * nchannels + 0];
                 // uint16_t g = static_cast<uint16_t*>(buf)[col * nchannels + 1];
                 // uint16_t b = static_cast<uint16_t*>(buf)[col * nchannels + 2];
 
-                float r = static_cast<float*>(buf)[col * nchannels + 0];
-                float g = static_cast<float*>(buf)[col * nchannels + 1];
-                float b = static_cast<float*>(buf)[col * nchannels + 2];
+                float r = static_cast<float*>(buf)[col * nc + 0];
+                float g = static_cast<float*>(buf)[col * nc + 1];
+                float b = static_cast<float*>(buf)[col * nc + 2];
 
                 this->pixels.push_back(r);
                 this->pixels.push_back(g);
