@@ -51,3 +51,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE tiff)
 if (MSVC_VERSION GREATER_EQUAL "1900")
     SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES LINK_FLAGS "setargv.obj")
 endif()
+
+if (USE_TIFF)
+    message(STATUS "Using tiff library")
+    add_definitions(-DUSE_TIFF=1)
+else()
+    message(STATUS "Not using tiff library, only exr textures can be used")
+endif()
+
