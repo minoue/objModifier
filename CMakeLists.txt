@@ -10,6 +10,8 @@ set(SOURCE_FILES
     src/image.cpp
     )
 
+set(CMAKE_CXX_STANDARD 11)
+
 if (NOT EIGEN_ROOT_DIR)
     message(FATAL_ERROR "Eigen3 dir must be set")
 else()
@@ -47,15 +49,14 @@ link_directories(/usr/local/lib)
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE tiff)
 if (MSVC_VERSION GREATER_EQUAL "1900")
     SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES LINK_FLAGS "setargv.obj")
 endif()
 
 if (USE_TIFF)
     message(STATUS "Using tiff library")
+    target_link_libraries(${PROJECT_NAME} PRIVATE tiff)
     add_definitions(-DUSE_TIFF=1)
 else()
     message(STATUS "Not using tiff library, only exr textures can be used")
 endif()
-
