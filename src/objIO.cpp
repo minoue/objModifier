@@ -11,7 +11,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef USE_OPENMP
 #include <omp.h>
+#endif
 
 #include "objIO.hpp"
 #include "timer.hpp"
