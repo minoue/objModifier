@@ -12,15 +12,22 @@ int main(int argc, char* argv[])
 
     std::vector<std::string> texture_paths;
     std::string input_obj;
+    std::string output_obj;
     bool normalDisplacement = false;
 
     app.add_option("-t, --textures", texture_paths, "Displacement textures");
     app.add_option("-i, --input", input_obj, "Input obj file");
+    app.add_option("-o, --output", output_obj, "Output name");
     app.add_flag("-n, --normalDisplacement", normalDisplacement, "Normal displacement");
 
     CLI11_PARSE(app, argc, argv);
 
-    std::string out_path = Utils::pathReplaceBody(input_obj, "out_displaced");
+    std::string out_path;
+    if (output_obj.empty()) {
+        out_path = Utils::pathReplaceBody(input_obj, "out");
+    } else {
+        out_path = Utils::pathReplaceBody(input_obj, output_obj);
+    }
 
     // Load Textures
     std::vector<Image> texture_data;
