@@ -8,6 +8,7 @@ set(SOURCE_FILES
     src/timer.cpp
     src/util.cpp
     src/image.cpp
+    src/texture.cpp
     )
 
 set(CMAKE_CXX_STANDARD 11)
