@@ -112,19 +112,23 @@ void Texture::normalDisplacement(Mesh& mesh, std::vector<Image>& imgArray)
             size_t udim = get_udim(u, v);
 
             Vector3f rgb;
-
-            Image& img = imgArray[udim - 1];
-            int width = img.width;
-            int height = img.height;
-            int channels = img.nchannels;
-
-            if (img.pixels.size() == 0) {
-                // If texture at UV is missing, use same point
+            
+            if (udim > imgArray.size()) {
+                // If the UV is outside the given UDIM range, use the same point
                 rgb << 0, 0, 0;
             } else {
-                Vector2f local_uv = localize_uv(u, v);
-                Vector3f rgb;
-                rgb = get_pixel_values(local_uv.x(), local_uv.y(), img.pixels, width, height, channels);
+                Image& img = imgArray[udim - 1];
+
+                if (img.isEmpty) {
+                    // If the UV is within the given UDIM but has no texture, use the same point
+                    rgb << 0, 0, 0;
+                } else {
+                    int width = img.width;
+                    int height = img.height;
+                    int channels = img.nchannels;
+                    Vector2f local_uv = localize_uv(u, v);
+                    rgb = get_pixel_values(local_uv.x(), local_uv.y(), img.pixels, width, height, channels);
+                }
             }
 
             Vector3f new_pp = P + (N * rgb.x());
@@ -197,19 +201,24 @@ void Texture::vectorDisplacement(Mesh& mesh, std::vector<Image>& imgArray)
 
             Vector3f displace;
 
-            Image& img = imgArray[udim - 1];
-            int width = img.width;
-            int height = img.height;
-            int channels = img.nchannels;
-            if (img.pixels.size() == 0) {
-                // If texture at UV is missing, use same point
+            if (udim > imgArray.size()) {
+                // If the UV is outside the given UDIM range, use the same point
                 displace << 0, 0, 0;
-                ;
             } else {
-                Vector2f local_uv = localize_uv(u, v);
-                Vector3f rgb;
-                rgb = get_pixel_values(local_uv.x(), local_uv.y(), img.pixels, width, height, channels);
-                displace = rgb.transpose() * mat;
+                Image& img = imgArray[udim - 1];
+                if (img.isEmpty) {
+                    // If the UV is within the given UDIM but has no texture, use the same point
+                    displace << 0, 0, 0;
+                } else {
+                    int width = img.width;
+                    int height = img.height;
+                    int channels = img.nchannels;
+
+                    Vector2f local_uv = localize_uv(u, v);
+                    Vector3f rgb;
+                    rgb = get_pixel_values(local_uv.x(), local_uv.y(), img.pixels, width, height, channels);
+                    displace = rgb.transpose() * mat;
+                }
             }
 
             Vector3f new_pp = P0 + displace;

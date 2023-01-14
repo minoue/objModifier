@@ -16,6 +16,7 @@ Image::Image() {};
 Image::Image(std::string path)
 {
     read(path);
+    this->isEmpty = false;
 }
 
 Image::~Image() {};

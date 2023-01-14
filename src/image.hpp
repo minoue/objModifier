@@ -14,6 +14,7 @@ public:
     int nchannels;
     std::vector<float> pixels;
     void read(const std::string path);
+    bool isEmpty = true;
 
 private:
     void loadExr(const std::string& path);
