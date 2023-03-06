@@ -4,28 +4,43 @@ A command line tool to apply vector/normal displacement map to an obj file.
 ## Requirements
 
 * [Eigen](https://eigen.tuxfamily.org/index.php?title=Main_Page)
+* [libtiff](http://www.libtiff.org)
 * [tinyexr](https://github.com/syoyo/tinyexr) (included)
-* [libtiff](http://www.libtiff.org) (optional)
 
 ## Build
 
-mac/linux
+#### mac/linux with libtiff installed
+
+```sh
+mkdir build
+cd build
+cmake -G "Unix Makefiles" -DEIGEN_ROOT_DIR=/full/path/to/eigen-3.3.9 -DCMAKE_BUILD_TYPE=Release ../
+cmake --build . --config Release
 ```
->> mkdir build
->> cd build
->> cmake -G "Unix Makefiles" -DEIGEN_ROOT_DIR=/full/path/to/eigen-3.3.9 -DCMAKE_BUILD_TYPE=Release ../
->> cmake --build . --config Release
-```
 
-To use tiff images, use `-DUSE_TIFF=1` and make sure libtiff libraries are installed.
-
-To use openmp on MacOS, install gcc via homebrew and use it to build by adding `-DCMAKE_CXX_COMPILER=g++11`.
-
+To use OpenMP on MacOS, install gcc via homebrew and use it to build by adding `-DCMAKE_CXX_COMPILER=g++11`.
 eg.
 ```
-cmake -G "Unix Makefiles" -DUSE_TIFF=1 -DCMAKE_CXX_COMPILER=g++11 -DEIGEN_ROOT_DIR=/full/path/to/eigen-3.3.9 -DCMAKE_BUILD_TYPE=Release ../
+cmake -G "Unix Makefiles" -DCMAKE_CXX_COMPILER=g++11 -DEIGEN_ROOT_DIR=/full/path/to/eigen-3.3.9 -DCMAKE_BUILD_TYPE=Release ../
 ```
 
+#### mac/linux without libtiff installed
+
+```sh
+cmake -G "Unix Makefiles" \
+    -DEIGEN_ROOT_DIR=/Volumes/CT1000MX/git/objModifier/eigen-3.3.9 \
+    -DTIFF_INCLUDE_DIR=/Users/minoue/.local/include \
+    -DTIFF_LIB_DIR=/Users/minoue/.local/lib \
+    -DCMAKE_BUILD_TYPE=Release \
+    ../
+cmake --build . --config Release
+```
+
+#### Windows10 with litiff installed
+```
+cmake -G "Visual Studio 17 2022" -DEIGEN_ROOT_DIR=C:\path\path\eigen -DCMAKE_BUILD_TYPE=Release ../
+cmake --build . --config Release
+```
 
 
 ## Usage
