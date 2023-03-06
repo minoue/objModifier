@@ -53,12 +53,13 @@ Options:
   -h,--help                   Print this help message and exit
   -t,--textures TEXT ...      Displacement textures
   -i,--input TEXT             Input obj file
+  -o,--output TEXT            Output name
   -n,--normalDisplacement     Normal displacement
 ```
 
 ## Example
 ```
->>./objModifier -i ../test/VDispDiagnosticMesh_high.obj -t ../test/testVDM.*.exr
+>>./objModifier -i /test/VDispDiagnosticMesh_high.obj -o out -t /test/testVDM.*.exr
 ```
 
-"out_displaced.obj" will be generated in the same directory of the source mesh.
+"out.obj" will be generated in the same directory of the source mesh.
