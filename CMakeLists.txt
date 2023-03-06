@@ -13,20 +13,21 @@ set(SOURCE_FILES
 
 set(CMAKE_CXX_STANDARD 11)
 
+
 if (NOT EIGEN_ROOT_DIR)
     message(FATAL_ERROR "Eigen3 dir must be set")
 else()
     message(STATUS "Using EIGEN_DIR ${EIGEN_DIR}")
 endif()
 
+
 if (WIN32)
     if (MSVC_VERSION GREATER_EQUAL "1900")
-        # include(CheckCXXCompilerFlag)
-        # CHECK_CXX_COMPILER_FLAG("/std:c++latest" _cpp_latest_flag_supported)
-        # if (_cpp_latest_flag_supported)
-        #     add_compile_options("/std:c++latest")
-        # endif()
-        # include_directories("E:/app/tiff/include")
+        include(CheckCXXCompilerFlag)
+        CHECK_CXX_COMPILER_FLAG("/std:c++latest" _cpp_latest_flag_supported)
+        if (_cpp_latest_flag_supported)
+            add_compile_options("/std:c++latest")
+        endif()
     endif()
 else()
     if(NOT CMAKE_BUILD_TYPE)
@@ -38,27 +39,56 @@ else()
     set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 endif()
 
+
+# OpenMP
 find_package(OpenMP)
 if (OPENMP_CXX_FOUND)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
     add_definitions(-DUSE_OPENMP)
 endif()
 
-include_directories(/usr/local/include)
+
+# Eigen3
 include_directories(${EIGEN_ROOT_DIR})
 
-link_directories(/usr/local/lib)
+
+# libtiff
+find_package(TIFF)
+if (TIFF_FOUND)
+    message("Tiff include dir : ${TIFF_INCLUDE_DIR}")
+    message("Tiff libraries : ${TIFF_LIBRARIES}")
+    include_directories(${TIFF_INCLUDE_DIR})
+else ()
+    message(WARNING "Tiff package not found. Trying to use custom libtiff dir")
+
+    if (NOT TIFF_INCLUDE_DIR)
+        message(FATAL_ERROR "Tiff include dir must be set")
+    else()
+        message(STATUS "Tiff include dir : ${TIFF_INCLUDE_DIR}")
+    endif()
+
+    if (NOT TIFF_LIB_DIR)
+        message(FATAL_ERROR "Tiff lib dir must be set")
+    else()
+        message(STATUS "Tiff lib dir : ${TIFF_LIB_DIR}")
+    endif()
+
+    include_directories(${TIFF_INCLUDE_DIR})
+    link_directories(${TIFF_LIB_DIR})
+endif()
+
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+
 
 if (MSVC_VERSION GREATER_EQUAL "1900")
     SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES LINK_FLAGS "setargv.obj")
 endif()
 
-if (USE_TIFF)
-    message(STATUS "Using tiff library")
+
+if (TIFF_FOUND)
+    target_link_libraries(${PROJECT_NAME} PRIVATE TIFF::TIFF)
+else ()
     target_link_libraries(${PROJECT_NAME} PRIVATE tiff)
-    add_definitions(-DUSE_TIFF=1)
-else()
-    message(STATUS "Not using tiff library, only exr textures can be used")
 endif()
+

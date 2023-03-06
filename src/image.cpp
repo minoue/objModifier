@@ -4,12 +4,7 @@
 #include "tinyexr.h"
 #include "util.hpp"
 
-#ifdef USE_TIFF
 #include "tiffio.hxx"
-constexpr bool kUseTiff = true;
-#else
-constexpr bool kUseTiff = false;
-#endif
 
 Image::Image() {};
 
@@ -28,12 +23,7 @@ void Image::read(const std::string path)
     if (ext == "exr") {
         loadExr(path);
     } else if (ext == "tif" || ext == "tiff") {
-        if (kUseTiff) {
-            loadTif(path);
-        } else {
-            std::cout << "Tiff loader is disabled. Use exr image or use -DUSE_TIFF=1 in CMake build." << std::endl;
-            exit(0);
-        }
+        loadTif(path);
     } else {
         std::cout << "Not supported images" << std::endl;
     }
@@ -69,7 +59,6 @@ void Image::loadExr(const std::string& path)
     }
 }
 
-#ifdef USE_TIFF
 void Image::loadTif(const std::string& path)
 {
     uint32_t width;
@@ -116,4 +105,3 @@ void Image::loadTif(const std::string& path)
         exit(0);
     }
 }
-#endif
