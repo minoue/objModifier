@@ -93,8 +93,9 @@ void Texture::normalDisplacement(Mesh& mesh, std::vector<Image>& imgArray)
     std::vector<Vertex> tempVertices;
     tempVertices.resize(mesh.vertices.size());
 
+    int numFaces = static_cast<int>(mesh.faces.size());
 #pragma omp parallel for
-    for (size_t i = 0; i < mesh.faces.size(); i++) {
+    for (int i = 0; i < numFaces; i++) {
         Face& face = mesh.faces[i];
         size_t numFaceVerts = face.FaceVertices.size();
         for (size_t j = 0; j < numFaceVerts; j++) {
@@ -148,8 +149,9 @@ void Texture::vectorDisplacement(Mesh& mesh, std::vector<Image>& imgArray)
     std::vector<Vertex> tempVertices;
     tempVertices.resize(mesh.vertices.size());
 
+    int numFaces = static_cast<int>(mesh.faces.size());
 #pragma omp parallel for
-    for (size_t i = 0; i < mesh.faces.size(); i++) {
+    for (int i = 0; i < numFaces; i++) {
         Face& face = mesh.faces[i];
         size_t numFaceVerts = face.FaceVertices.size();
 

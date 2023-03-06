@@ -167,10 +167,12 @@ void Mesh::setToFacenormal()
     Vector3f zeroVec(0, 0, 0);
     std::fill(tempNormals.begin(), tempNormals.end(), zeroVec);
 
+    int numFaces = static_cast<int>(this->faces.size());
 #pragma omp parallel for
-    for (size_t i = 0; i < this->faces.size(); i++) {
+    for (int i = 0; i < numFaces; i++) {
         Face& face = this->faces[i];
         size_t numFaceVerts = face.FaceVertices.size();
+
 
         for (size_t i = 0; i < numFaceVerts; i++) {
             FaceVertex *current, *next, *nextNext;
