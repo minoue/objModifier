@@ -31,7 +31,7 @@ Mesh::~Mesh() { }
 
 void ::Mesh::read(std::string path)
 {
-    std::cout << "Loading obj..." << std::endl;
+    std::cout << "Loading obj : " << path << std::endl;
     Timer timer;
     timer.start();
 
@@ -218,7 +218,7 @@ void Mesh::write(std::string out_path)
     Timer timer;
     timer.start();
 
-    std::cout << "Writing new obj file..." << std::endl;
+    std::cout << "Writing new obj file : " << out_path << std::endl;
 
     FILE* fp;
     fp = fopen(out_path.c_str(), "w");
