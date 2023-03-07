@@ -28,9 +28,9 @@ cmake -G "Unix Makefiles" -DCMAKE_CXX_COMPILER=g++11 -DEIGEN_ROOT_DIR=/full/path
 
 ```sh
 cmake -G "Unix Makefiles" \
-    -DEIGEN_ROOT_DIR=/Volumes/CT1000MX/git/objModifier/eigen-3.3.9 \
-    -DTIFF_INCLUDE_DIR=/Users/minoue/.local/include \
-    -DTIFF_LIB_DIR=/Users/minoue/.local/lib \
+    -DEIGEN_ROOT_DIR=/full/path/to/eigen \
+    -DTIFF_INCLUDE_DIR=/path/to/libtiff/include \
+    -DTIFF_LIB_DIR=/path/to/libtiff/lib \
     -DCMAKE_BUILD_TYPE=Release \
     ../
 cmake --build . --config Release
