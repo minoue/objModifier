@@ -63,3 +63,10 @@ Options:
 ```
 
 "out.obj" will be generated in the same directory of the source mesh.
+
+
+## Credits
+[CLI11: Command line parser for C++11](https://github.com/CLIUtils/CLI11) / The 3-Clause BSD License / Henry Schreiner
+
+[tinyexr](https://github.com/syoyo/tinyexr) / The 3-Clause BSD License / Shoyo Fujita
+
