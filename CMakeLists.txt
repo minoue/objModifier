@@ -11,7 +11,7 @@ set(SOURCE_FILES
     src/texture.cpp
     )
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 
 if (NOT EIGEN_ROOT_DIR)

@@ -6,6 +6,7 @@ A command line tool to apply vector/normal displacement map to an obj file.
 * [Eigen](https://eigen.tuxfamily.org/index.php?title=Main_Page)
 * [libtiff](http://www.libtiff.org)
 * [tinyexr](https://github.com/syoyo/tinyexr) (included)
+* C++17
 
 ## Build
 

@@ -3,6 +3,8 @@
 #include "timer.hpp"
 #include "util.hpp"
 #include <string>
+#include <filesystem>
+
 
 int main(int argc, char* argv[])
 {
@@ -22,11 +24,11 @@ int main(int argc, char* argv[])
 
     CLI11_PARSE(app, argc, argv);
 
-    std::string out_path;
+    std::filesystem::path path(input_obj);
     if (output_obj.empty()) {
-        out_path = Utils::pathReplaceBody(input_obj, "out");
+        path.replace_filename("output.obj");
     } else {
-        out_path = Utils::pathReplaceBody(input_obj, output_obj);
+        path.replace_filename(output_obj + ".obj");
     }
 
     // Load Textures
@@ -71,7 +73,7 @@ int main(int argc, char* argv[])
     obj.setToFacenormal();
 
     // Write object
-    obj.write(out_path);
+    obj.write(path.string());
 
     return 0;
 }
