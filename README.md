@@ -67,7 +67,11 @@ Options:
 
 
 ## Credits
+This software uses the following libraries.
+
 [CLI11: Command line parser for C++11](https://github.com/CLIUtils/CLI11) / The 3-Clause BSD License / Henry Schreiner
 
 [tinyexr](https://github.com/syoyo/tinyexr) / The 3-Clause BSD License / Shoyo Fujita
 
+## License
+[MIT License](./LICENSE.md)
