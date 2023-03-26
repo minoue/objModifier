@@ -17,7 +17,7 @@ set(CMAKE_CXX_STANDARD 17)
 if (NOT EIGEN_ROOT_DIR)
     message(FATAL_ERROR "Eigen3 dir must be set")
 else()
-    message(STATUS "Using EIGEN_DIR ${EIGEN_DIR}")
+    message(STATUS "Using EIGEN_DIR ${EIGEN_ROOT_DIR}")
 endif()
 
 
@@ -47,10 +47,8 @@ if (OPENMP_CXX_FOUND)
     add_definitions(-DUSE_OPENMP)
 endif()
 
-
 # Eigen3
 include_directories(${EIGEN_ROOT_DIR})
-
 
 # libtiff
 find_package(TIFF)
@@ -59,19 +57,16 @@ if (TIFF_FOUND)
     message("Tiff libraries : ${TIFF_LIBRARIES}")
     include_directories(${TIFF_INCLUDE_DIR})
 else ()
-    message(WARNING "Tiff package not found. Trying to use custom libtiff dir")
+    message(NOTICE "Tiff package not found. Using custom libtiff dir")
 
-    if (NOT TIFF_INCLUDE_DIR)
-        message(FATAL_ERROR "Tiff include dir must be set")
-    else()
-        message(STATUS "Tiff include dir : ${TIFF_INCLUDE_DIR}")
+    if (NOT TIFF_INSTALL_DIR)
+        message(FATAL_ERROR "Tiff install dir must be set")
     endif()
 
-    if (NOT TIFF_LIB_DIR)
-        message(FATAL_ERROR "Tiff lib dir must be set")
-    else()
-        message(STATUS "Tiff lib dir : ${TIFF_LIB_DIR}")
-    endif()
+    set(TIFF_INCLUDE_DIR "${TIFF_INSTALL_DIR}/include")
+    set(TIFF_LIB_DIR "${TIFF_INSTALL_DIR}/lib")
+    message(STATUS "Tiff include dir : ${TIFF_INCLUDE_DIR}")
+    message(STATUS "Tiff lib dir : ${TIFF_LIB_DIR}")
 
     include_directories(${TIFF_INCLUDE_DIR})
     link_directories(${TIFF_LIB_DIR})
