@@ -10,39 +10,25 @@ A command line tool to apply vector/normal displacement map to an obj file.
 
 ## Build
 
-#### mac/linux with libtiff installed
-
 ```sh
 mkdir build
 cd build
-cmake -G "Unix Makefiles" -DEIGEN_ROOT_DIR=/full/path/to/eigen-3.3.9 -DCMAKE_BUILD_TYPE=Release ../
+cmake -DEIGEN_ROOT_DIR=/full/path/to/eigen ../
 cmake --build . --config Release
 ```
 
 To use OpenMP on MacOS, install gcc via homebrew and use it to build by adding `-DCMAKE_CXX_COMPILER=g++11`.
 eg.
 ```
-cmake -G "Unix Makefiles" -DCMAKE_CXX_COMPILER=g++11 -DEIGEN_ROOT_DIR=/full/path/to/eigen-3.3.9 -DCMAKE_BUILD_TYPE=Release ../
+cmake -DCMAKE_CXX_COMPILER=g++11 -DEIGEN_ROOT_DIR=/full/path/to/eigen ../
 ```
 
-#### mac/linux without libtiff installed
+#### If libtiff is not installed but built in your local dir
 
-```sh
-cmake -G "Unix Makefiles" \
-    -DEIGEN_ROOT_DIR=/full/path/to/eigen \
-    -DTIFF_INCLUDE_DIR=/path/to/libtiff/include \
-    -DTIFF_LIB_DIR=/path/to/libtiff/lib \
-    -DCMAKE_BUILD_TYPE=Release \
-    ../
+```
+cmake -DEIGEN_ROOT_DIR=/full/path/to/eigen -DTIFF_INSTALL_DIR=/libtiff/built/dir ../
 cmake --build . --config Release
 ```
-
-#### Windows10 with litiff installed
-```
-cmake -G "Visual Studio 17 2022" -DEIGEN_ROOT_DIR=C:\path\path\eigen -DCMAKE_BUILD_TYPE=Release ../
-cmake --build . --config Release
-```
-
 
 ## Usage
 
