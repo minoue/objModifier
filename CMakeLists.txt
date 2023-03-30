@@ -14,13 +14,6 @@ set(SOURCE_FILES
 set(CMAKE_CXX_STANDARD 17)
 
 
-if (NOT EIGEN_ROOT_DIR)
-    message(FATAL_ERROR "Eigen3 dir must be set")
-else()
-    message(STATUS "Using EIGEN_DIR ${EIGEN_ROOT_DIR}")
-endif()
-
-
 if (WIN32)
     if (MSVC_VERSION GREATER_EQUAL "1900")
         include(CheckCXXCompilerFlag)
@@ -48,7 +41,7 @@ if (OPENMP_CXX_FOUND)
 endif()
 
 # Eigen3
-include_directories(${EIGEN_ROOT_DIR})
+include_directories(eigen)
 
 # libtiff
 find_package(TIFF)

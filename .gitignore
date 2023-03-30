@@ -2,7 +2,5 @@ build/
 test/
 ._*
 compile_flags.txt
-Eigen
 *.sublime-project
 *.sublime-workspace
-eigen-3.3.9*

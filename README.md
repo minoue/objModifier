@@ -11,22 +11,25 @@ A command line tool to apply vector/normal displacement map to an obj file.
 ## Build
 
 ```sh
+git clone https:/github.com/minoue/objModifier 
+cd objModifier
+git submodule update --init --recursive
 mkdir build
 cd build
-cmake -DEIGEN_ROOT_DIR=/full/path/to/eigen ../
+cmake -DCMAKE_BUILD_TYPE=Release ../
 cmake --build . --config Release
 ```
 
 To use OpenMP on MacOS, install gcc via homebrew and use it to build by adding `-DCMAKE_CXX_COMPILER=g++11`.
 eg.
 ```
-cmake -DCMAKE_CXX_COMPILER=g++11 -DEIGEN_ROOT_DIR=/full/path/to/eigen ../
+cmake -DCMAKE_CXX_COMPILER=g++11 ../
 ```
 
 #### If libtiff is not installed but built in your local dir
 
 ```
-cmake -DEIGEN_ROOT_DIR=/full/path/to/eigen -DTIFF_INSTALL_DIR=/libtiff/built/dir ../
+cmake -DTIFF_INSTALL_DIR=/libtiff/built/dir -DCMAKE_BUILD_TYPE=Release ../
 cmake --build . --config Release
 ```
 
